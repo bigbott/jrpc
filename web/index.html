@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>JRPC Demo</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="css/main.css" rel="stylesheet" type="text/css">
+        <link href="css/jquery.highlight.css" rel="stylesheet" type="text/css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.1/pure-min.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <div class="page"><br>
+            <h1> JRPC Demo </h1>
+            <p>
+                JRPC is a Java JSON-RPC over HTTP mini framework. 
+                <a href="https://github.com/bigbott/jrpc/wiki/JRPC">Read more</a>
+            </p>
+            <h2>Examples:</h2>
+            <div id="nav">
+                <a href="#numbers">
+                    <label>Send and receive numbers</label>
+                </a><br>
+                <a href="#strings">
+                    <label>Send and receive strings</label>
+                </a><br>
+                <a href="#objects">
+                    <label>Send and receive objects</label>
+                </a><br>
+            </div>
+            <div id="numbers">
+                <h2>Send and receive numbers</h2>
+                <input type="text" id="firstNumber" class="numberInput" />
+                <span> + </span> 
+                <input type="text" id="secondNumber" class="numberInput" />
+                <span> = </span> 
+                <input type="text" id="result" class="numberInput" />
+                <button type="button" id="calculate">Calculate</button><br>
+                <p>Here is the client side code:</p>
+                <pre class="code" data-language="js">
+        let url = '/jrpc/demo/AddNumbers';
+        let data = {dataType: "Integer", data: [firstNumber, secondNumber]};
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                main.view.showAddNumbersResult(response.data[0]);
+            }
+        });
+                </pre>
+                <p>Server side code that we need to write to handle above request consist of class AddNumbers that implements 
+                    JrpcMethod interface:
+                </p>
+                <pre class="code" data-language="js">
+    public class AddNumbers implements JrpcMethod{
+
+    @Override
+    public ResponseJsonObject execute(HttpServletRequest request, 
+             HttpServletResponse response, RequestJsonObject requestJsonObject) {
+        Integer[] numbers = (Integer[])requestJsonObject.data;
+        int result = numbers[0] + numbers[1];
+        ResponseJsonObject responseJsonObject = new ResponseJsonObject();
+        responseJsonObject.data = new Integer[]{result};
+        return responseJsonObject;
+    }    
+}
+                </pre>
+
+
+            </div><br><br><br>
+            <div id="strings">
+                <h2>Send and receive strings</h2>
+                <p>In this example we will submit any three words to the server, then get them back and display.</p>
+                <input type="text" id="firstWord" class="textInput" value="Hello"/>
+                <span> &nbsp;&nbsp;</span> 
+                <input type="text" id="secondWord" class="textInput" value="world" />
+                <span> &nbsp;&nbsp; </span> 
+                <input type="text" id="thirdWord" class="textInput"  value="!!"/>
+                <button type="button" id="submit">Submit</button><br>
+                <h3 id="sentence"></h3>
+                <p>Here is the client side code:</p>
+                <pre class="code" data-language="js">
+        submitWords: function (firstWord, secondWord, thirdWord) {
+        let url = '/jrpc/demo/EchoWords';
+        let data = {dataType: "String", data: [firstWord, secondWord, thirdWord]};
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                main.view.showSentence(response.data);
+            }
+        });
+    }
+                </pre>
+                <p>Notice, that we changed <i>dataType</i> to String.</p>
+                <p>Here is the server-side code:</p>
+                <pre class="code" data-language="js">
+    public class EchoWords implements JrpcMethod{
+
+    @Override
+    public ResponseJsonObject execute(HttpServletRequest request, 
+             HttpServletResponse response, RequestJsonObject requestJsonObject) {
+        String[] words = (String[])requestJsonObject.data;
+        ResponseJsonObject responseJsonObject = new ResponseJsonObject();
+        responseJsonObject.data = words;
+        return responseJsonObject;
+    }    
+}
+                </pre>
+            </div><br><br><br>
+            <div id="objects">
+                <h2>Send and receive objects</h2>
+            </div>
+            <p>Let's say we have a list of users and we want to filter them by age and/or gender</p>
+            <input type="checkbox" id="ageCheckbox" /> 18 and older <br>
+            <input type="checkbox" id="maleCheckbox" /> Male only
+            <input type="checkbox" id="femaleCheckbox" /> Female only  <br><br>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                </tbody>
+            </table><br>
+            <p>We send JSON in request like follow:<br>
+                <i class="inlineCode">[{"type": "age", "value:18"}, {"type": "gender", "value":1} ]</i>
+            </p>
+            <p>To deserialize JSON on the server side we use next Java class:<br>
+            </p>
+            <pre class="code" data-language="js">
+    public class UserFilter {
+    public String type;
+    public int value;
+  }
+            </pre>
+            <p>Here is the client side code that sends request:</p>
+            <pre class="code" data-language="js">
+        getUsersByFilters: function () {
+        let url = '/jrpc/demo/GetUsersByFilters';
+        let data = {dataType: "UserFilter", data: main.model.filters};
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                main.view.showUsers(response.data);
+            }
+        });
+    }
+            </pre>
+            <p>Notice, that we changed <i>dataType</i> to UserFilter.</p>
+
+            <p>Here is the server-side code:</p>
+            <pre class="code" data-language="js">
+    public class GetUsersByFilters implements JrpcMethod{
+
+    @Override
+    public ResponseJsonObject execute(HttpServletRequest request, 
+             HttpServletResponse response, RequestJsonObject requestJsonObject) {
+        UserFilter[] filters = (UserFilter[])requestJsonObject.data;
+        User [] users = UserManager.getByFilters(filters);
+        ResponseJsonObject responseJsonObject = new ResponseJsonObject();
+        responseJsonObject.data = users;
+        return responseJsonObject;
+    }    
+}
+            </pre>
+            <p>Here is the User class. For the purpose of this tutorial it was made as simple as possible:</p>
+            <pre class="code" data-language="js">
+public class User {
+    public String name;
+    public int age;
+    public boolean isMale;
+    
+    public User (String name, int age, boolean isMale){
+        this.name = name;
+        this.age = age;
+        this.isMale = isMale;
+    }
+}
+            </pre>
+            <br>
+            <p>
+                JRPC uses Gson to deserialize JSON into Java objects and serialize Java objects into JSON. 
+                We don't need to explicitly write this conversion code - JRPC does it for us. 
+                But we should write Java class that mapped to the JSON and those classes can become complicated in real app.
+                Here is an example of more-less real world JSON representing an online order:  
+            </p>
+            <pre class="code" data-language="js">
+[{
+	"id": "Z000000001",
+	"totalPrice": 546.34,
+	"date": "15.01.2022",
+	"customer": {
+		"id": "U00000032",
+		"name": "John Smith",
+		"address": {
+			"country": "UK",
+			"city": "London",
+			"zipCode": "00001",
+			"street": "Bakers",
+			"buildingNumber": 123
+		}
+	},
+	"products": [{
+		"id": "P000000345",
+		"price": 234.18,
+		"title": "Smartphone Xiaomi 10S",
+		"sku": "sku000000023423"
+	},
+	{
+		"id": "P000000347",
+		"price": 312.16,
+		"title": "Smartphone Samsung S21",
+		"sku": "sku000000023424"
+	}]
+}]
+            </pre>
+             <p>In order for JRPC to parse above JSON we should specify <i class='inlineCode'>dataType: "Order"</i> 
+                 and have an Order class in our data package on the server side like this:</p>
+            <pre class="code" data-language="js">
+public class Order {
+    public String id;
+    public double totalPrice;
+    public String date;
+    public Customer customer;
+    public Product[] products;
+    
+    
+    class Customer{
+        public String id;
+        public String name;
+        public Address address;
+    }
+    
+    class Address {
+        public String country;
+        public String city;
+        public String zipCode;
+        public String street;
+        public int buildingNumber;
+    }
+    
+    class Product {
+        public String id;
+        public double price;
+        public String title;
+        public String sku;
+    }
+    
+}
+            </pre><br><br>
+             <p>You can read more about JRPC <a href="https://github.com/bigbott/jrpc/wiki/JRPC">here</a>. 
+                 Take code from <a href="https://github.com/bigbott/jrpc">here</a>. Happy coding!</p>
+             
+            <br><br><br><br><br><br>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+        <script src="js/vendor/jquery.highlight.js"></script>
+        <script src="js/main.js"></script>
+        <script src="js/mainCtrl.js"></script>
+        <script src="js/mainView.js"></script>
+        <script src="js/mainModel.js"></script>
+        <script>
+            'use strict';
+            $(function () {
+                main.init();
+            });
+        </script>
+    </body>
+</html>

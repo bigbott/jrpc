@@ -1,0 +1,4 @@
+{
+   "methodPackage": "me.jrpc.example.method",
+   "dataPackage": "me.jrpc.example.data"  
+}
