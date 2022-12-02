@@ -64,7 +64,7 @@ JRPC creates related objects by reflection using class.forName(<dataPackage> + "
 
  
 ### Demo
-The demo is here. (under construction currently)
+The demo is [here](https://phoneparator.com/jrpc). 
 
 ### Getting started
 The best way to start with JRPC is to download JRPC-example project from github. If you don't use Netbeans your IDE should have 
