@@ -83,4 +83,4 @@ The client uses jQuery. If you have this "we don't use jQuery anymore" attitude,
 
 
 ### License
-MIT license. Please do whatever you want but don't blame me. 
+MIT license. 
