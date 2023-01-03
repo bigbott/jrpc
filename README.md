@@ -73,11 +73,11 @@ JRPC-example project contains full demo code (client and server).
 The client uses jQuery. If you have this "we don't use jQuery anymore" attitude, please, take it as an opportunity and rewrite the client in "vanilla JavaScript". Lol.
 
 ### More simple Java frameworks
-**JPaS** - stands for Java Pages Simplified. It is a simple web mini framework intended to create multi-page applications, i.e. applications that know
+**[JPaS](https://github.com/bigbott/jpas)** - stands for Java Pages Simplified. It is a simple web mini framework intended to create multi-page applications, i.e. applications that know
        how to process GET requests, created by the user clicking a link or bookmark. It does not use any templates e.g. JSP, Velocity, Thymeleaf, etc.
-       Instead, it parses plain HTML at server start time using JSoup and modifies them thru Java API at request time.  
+       Instead, it parses plain HTML at server start time using JSoup and modifies them thru Java API at request time.   
 
-**JSId** - stands for Java Simple Identification. It is an authentication framework that uses custom encrypted JWT (JSON Web Tokens) for authentication. 
+**[JSId](https://github.com/bigbott/JSId)** - stands for Java Simple Identification. It is an authentication framework that uses custom encrypted JWT (JSON Web Tokens) for authentication. 
        It consists of a JQuery plugin that renders login/register dialogs and a Java Servlet Filter that check credentials and generates tokens. 
           
 
